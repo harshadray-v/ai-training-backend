@@ -1,14 +1,16 @@
 # Customer API
 
-A .NET 9 Minimal API that provides RESTful CRUD operations for managing customers. Built with Entity Framework Core and SQL Server.
+A .NET 9 Web API that provides RESTful CRUD operations for managing customers. Built with ASP.NET Core controllers, Entity Framework Core, and SQL Server.
 
 ## Architecture
 
 ```
 CustomerApi/
 ├── CustomerApi.sln                    # Solution file
-├── CustomerApi.Api/                   # Minimal API project (entry point)
-│   ├── Program.cs                     # Endpoints, DI, CORS, Swagger, middleware
+├── CustomerApi.Api/                   # Web API project (entry point)
+│   ├── Program.cs                     # DI, CORS, Swagger, middleware
+│   ├── Controllers/
+│   │   └── CustomersController.cs     # CRUD endpoints for customers
 │   ├── appsettings.json               # Configuration (DB connection, CORS)
 │   └── Properties/launchSettings.json # Dev server ports
 ├── CustomerApi.Core/                  # Class library (entities, data, repos)
