@@ -2,6 +2,7 @@ using CustomerApi.Core.DTOs;
 using CustomerApi.Core.Entities;
 using CustomerApi.Core.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CustomerApi.Api.Controllers;
 
@@ -44,11 +45,23 @@ public class CustomersController : ControllerBase
             LastName = dto.LastName,
             Email = dto.Email,
             Phone = dto.Phone,
-            Company = dto.Company,
-            Status = dto.Status
+            Status = dto.Status,
+            CustomerType = dto.CustomerType
         };
 
         var created = await _repo.AddAsync(customer);
+
+        // Create business profile if company name provided
+        if (!string.IsNullOrWhiteSpace(dto.CompanyName))
+        {
+            created.BusinessProfile = new CustomerBusinessProfile
+            {
+                CustomerId = created.Id,
+                CompanyName = dto.CompanyName,
+                LifecycleStage = "Lead"
+            };
+        }
+
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, ToDto(created));
     }
 
@@ -64,12 +77,36 @@ public class CustomersController : ControllerBase
             LastName = dto.LastName ?? string.Empty,
             Email = dto.Email ?? string.Empty,
             Phone = dto.Phone ?? string.Empty,
-            Company = dto.Company ?? string.Empty,
-            Status = dto.Status ?? string.Empty
+            Status = dto.Status ?? string.Empty,
+            CustomerType = dto.CustomerType ?? string.Empty
         };
 
         var updated = await _repo.UpdateAsync(id, changes);
-        return updated is not null ? Ok(ToDto(updated)) : NotFound();
+        if (updated is null) return NotFound();
+
+        // Update business profile if CompanyName provided
+        if (dto.CompanyName is not null)
+        {
+            var ctx = HttpContext.RequestServices.GetRequiredService<CustomerApi.Core.Data.CustomerDbContext>();
+            var profile = await ctx.CustomerBusinessProfiles.FirstOrDefaultAsync(p => p.CustomerId == id);
+            if (profile is not null)
+            {
+                profile.CompanyName = dto.CompanyName;
+            }
+            else
+            {
+                ctx.CustomerBusinessProfiles.Add(new CustomerBusinessProfile
+                {
+                    CustomerId = id,
+                    CompanyName = dto.CompanyName,
+                    LifecycleStage = "Customer"
+                });
+            }
+            await ctx.SaveChangesAsync();
+            updated.BusinessProfile = await ctx.CustomerBusinessProfiles.AsNoTracking().FirstOrDefaultAsync(p => p.CustomerId == id);
+        }
+
+        return Ok(ToDto(updated));
     }
 
     [HttpDelete("{id:int}")]
@@ -88,8 +125,10 @@ public class CustomersController : ControllerBase
         LastName = c.LastName,
         Email = c.Email,
         Phone = c.Phone,
-        Company = c.Company,
         Status = c.Status,
-        CreatedAt = c.CreatedAt
+        CustomerType = c.CustomerType,
+        CreatedAt = c.CreatedAt,
+        UpdatedAt = c.UpdatedAt,
+        CompanyName = c.BusinessProfile?.CompanyName
     };
 }

@@ -73,8 +73,8 @@ public class CustomerRepositoryTests : IDisposable
             LastName = "User",
             Email = "test@example.com",
             Phone = "(555) 000-0000",
-            Company = "Test Inc",
-            Status = "active"
+            Status = "Active",
+            CustomerType = "B2C"
         };
 
         var created = await _repository.AddAsync(newCustomer);
@@ -95,8 +95,8 @@ public class CustomerRepositoryTests : IDisposable
             LastName = "Person",
             Email = "new@example.com",
             Phone = "(555) 111-2222",
-            Company = "NewCo",
-            Status = "active"
+            Status = "Active",
+            CustomerType = "B2C"
         });
 
         var after = (await _repository.GetAllAsync()).Count();
@@ -108,7 +108,7 @@ public class CustomerRepositoryTests : IDisposable
     [Fact]
     public async Task UpdateAsync_ExistingId_UpdatesFields()
     {
-        var changes = new Customer { FirstName = "Updated", LastName = "", Email = "", Phone = "", Company = "", Status = "" };
+        var changes = new Customer { FirstName = "Updated", LastName = "", Email = "", Phone = "", Status = "", CustomerType = "" };
         var updated = await _repository.UpdateAsync(1, changes);
 
         updated.Should().NotBeNull();
@@ -118,7 +118,7 @@ public class CustomerRepositoryTests : IDisposable
     [Fact]
     public async Task UpdateAsync_NonExistentId_ReturnsNull()
     {
-        var changes = new Customer { FirstName = "Ghost", LastName = "", Email = "", Phone = "", Company = "", Status = "" };
+        var changes = new Customer { FirstName = "Ghost", LastName = "", Email = "", Phone = "", Status = "", CustomerType = "" };
         var result = await _repository.UpdateAsync(9999, changes);
         result.Should().BeNull();
     }
@@ -129,20 +129,20 @@ public class CustomerRepositoryTests : IDisposable
         var original = await _repository.GetByIdAsync(2);
         original.Should().NotBeNull();
 
-        // Only update company — pass empty strings for others so they are not changed
+        // Only update status — pass empty strings for others so they are not changed
         var changes = new Customer
         {
             FirstName = string.Empty,
             LastName = string.Empty,
             Email = string.Empty,
             Phone = string.Empty,
-            Company = "New Company",
-            Status = string.Empty
+            Status = "Archived",
+            CustomerType = string.Empty
         };
         var updated = await _repository.UpdateAsync(2, changes);
 
         updated.Should().NotBeNull();
-        updated!.Company.Should().Be("New Company");
+        updated!.Status.Should().Be("Archived");
         // FirstName should be preserved since we passed empty string (repository skips empty)
     }
 

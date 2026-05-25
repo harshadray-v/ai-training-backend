@@ -16,6 +16,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<IEnumerable<Customer>> GetAllAsync()
     {
         return await _context.Customers
+            .Include(c => c.BusinessProfile)
             .OrderBy(c => c.Id)
             .AsNoTracking()
             .ToListAsync();
@@ -24,6 +25,7 @@ public class CustomerRepository : ICustomerRepository
     public async Task<Customer?> GetByIdAsync(int id)
     {
         return await _context.Customers
+            .Include(c => c.BusinessProfile)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id);
     }
@@ -38,15 +40,18 @@ public class CustomerRepository : ICustomerRepository
 
     public async Task<Customer?> UpdateAsync(int id, Customer changes)
     {
-        var existing = await _context.Customers.FindAsync(id);
+        var existing = await _context.Customers
+            .Include(c => c.BusinessProfile)
+            .FirstOrDefaultAsync(c => c.Id == id);
         if (existing == null) return null;
 
-        if (changes.FirstName is not null) existing.FirstName = changes.FirstName;
-        if (changes.LastName is not null) existing.LastName = changes.LastName;
-        if (changes.Email is not null) existing.Email = changes.Email;
-        if (changes.Phone is not null) existing.Phone = changes.Phone;
-        if (changes.Company is not null) existing.Company = changes.Company;
-        if (changes.Status is not null) existing.Status = changes.Status;
+        if (!string.IsNullOrEmpty(changes.FirstName)) existing.FirstName = changes.FirstName;
+        if (!string.IsNullOrEmpty(changes.LastName)) existing.LastName = changes.LastName;
+        if (!string.IsNullOrEmpty(changes.Email)) existing.Email = changes.Email;
+        if (!string.IsNullOrEmpty(changes.Phone)) existing.Phone = changes.Phone;
+        if (!string.IsNullOrEmpty(changes.Status)) existing.Status = changes.Status;
+        if (!string.IsNullOrEmpty(changes.CustomerType)) existing.CustomerType = changes.CustomerType;
+        existing.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         return existing;

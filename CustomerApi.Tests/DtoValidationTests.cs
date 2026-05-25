@@ -25,8 +25,8 @@ public class DtoValidationTests
             LastName = "Doe",
             Email = "john@example.com",
             Phone = "(555) 123-4567",
-            Company = "ACME",
-            Status = "active"
+            CompanyName = "ACME",
+            Status = "Active"
         };
 
         var errors = ValidateModel(dto);
@@ -42,8 +42,8 @@ public class DtoValidationTests
             LastName = "Doe",
             Email = "john@example.com",
             Phone = "(555) 123-4567",
-            Company = "ACME",
-            Status = "active"
+            CompanyName = "ACME",
+            Status = "Active"
         };
 
         var errors = ValidateModel(dto);
@@ -59,8 +59,8 @@ public class DtoValidationTests
             LastName = "Doe",
             Email = "john@example.com",
             Phone = "(555) 123-4567",
-            Company = "ACME",
-            Status = "active"
+            CompanyName = "ACME",
+            Status = "Active"
         };
 
         var errors = ValidateModel(dto);
@@ -76,8 +76,8 @@ public class DtoValidationTests
             LastName = "Doe",
             Email = "not-an-email",
             Phone = "(555) 123-4567",
-            Company = "ACME",
-            Status = "active"
+            CompanyName = "ACME",
+            Status = "Active"
         };
 
         var errors = ValidateModel(dto);
@@ -93,7 +93,7 @@ public class DtoValidationTests
             LastName = "Doe",
             Email = "john@example.com",
             Phone = "(555) 123-4567",
-            Company = "ACME",
+            CompanyName = "ACME",
             Status = "unknown"
         };
 
@@ -127,7 +127,7 @@ public class DtoValidationTests
         var dto = new UpdateCustomerDto
         {
             FirstName = "Updated",
-            Status = "inactive"
+            Status = "Inactive"
         };
 
         var errors = ValidateModel(dto);

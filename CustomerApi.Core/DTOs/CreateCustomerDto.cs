@@ -24,10 +24,13 @@ public class CreateCustomerDto
     public string Phone { get; set; } = string.Empty;
 
     [Required]
-    [MaxLength(200)]
-    public string Company { get; set; } = string.Empty;
+    [RegularExpression("^(Active|Inactive|Archived|Pending)$", ErrorMessage = "Status must be 'Active', 'Inactive', 'Archived', or 'Pending'.")]
+    public string Status { get; set; } = "Active";
 
     [Required]
-    [RegularExpression("^(active|inactive)$", ErrorMessage = "Status must be 'active' or 'inactive'.")]
-    public string Status { get; set; } = "active";
+    [RegularExpression("^(B2C|B2B)$", ErrorMessage = "CustomerType must be 'B2C' or 'B2B'.")]
+    public string CustomerType { get; set; } = "B2C";
+
+    [MaxLength(200)]
+    public string? CompanyName { get; set; }
 }
