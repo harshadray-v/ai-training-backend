@@ -1,5 +1,8 @@
+using CustomerApi.Core.Configuration;
 using CustomerApi.Core.Data;
 using CustomerApi.Core.Repositories;
+using CustomerApi.Core.Services;
+using CustomerApi.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +18,10 @@ builder.Services.AddDbContext<CustomerDbContext>(options =>
 
 // Repository
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
+
+// Stripe Payment Service — keys loaded from environment variables / user-secrets
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection(StripeSettings.SectionName));
+builder.Services.AddScoped<IPaymentService, StripePaymentService>();
 
 // Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
